@@ -24,7 +24,7 @@ const PatientDetailsPage = () => {
           appointmentService.getAll()
         ]);
         setPatient(patientRes.data.data);
-        setAppointments(appointmentsRes.data.data.filter(apt => apt.paciente && apt.paciente.toString() === id));
+        setAppointments(appointmentsRes.data.data.filter(apt => apt.paciente && apt.paciente._id.toString() === id));
       } catch (err) {
         showError(getErrorMessage(err));
       } finally {
