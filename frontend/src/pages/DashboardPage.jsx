@@ -34,10 +34,10 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
-      <p className="text-sm text-gray-500 mb-6">Visão geral do sistema de agendamento</p>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
+      <p className="text-sm text-gray-500 mb-4 sm:mb-6">Visão geral do sistema de agendamento</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Total de Consultas" value={stats?.totalConsultas} icon="📅" color="primary" />
         <StatCard title="Total de Médicos" value={stats?.totalMedicos} icon="👨‍⚕️" color="green" />
         <StatCard title="Especialidades" value={stats?.totalEspecialidades} icon="🏥" color="purple" />

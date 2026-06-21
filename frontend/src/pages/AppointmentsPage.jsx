@@ -120,7 +120,8 @@ const AppointmentsPage = () => {
     }
   };
 
-  const handleDelete = async (appointment) => {
+  const handleDelete = async (appointment, e) => {
+    e.stopPropagation();
     const patientName = appointment.paciente?.nome || appointment.paciente;
     if (!window.confirm(`Excluir consulta de "${patientName}"?`)) return;
     try {
@@ -179,9 +180,9 @@ const AppointmentsPage = () => {
       key: 'actions',
       label: 'Ações',
       render: (row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => openEdit(row)}>Editar</Button>
-          <Button variant="danger" size="sm" onClick={() => handleDelete(row)}>Excluir</Button>
+          <Button variant="danger" size="sm" onClick={(e) => handleDelete(row, e)}>Excluir</Button>
         </div>
       ),
     },
@@ -205,7 +206,7 @@ const AppointmentsPage = () => {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Select
               label="Paciente"
               name="paciente"
@@ -236,7 +237,7 @@ const AppointmentsPage = () => {
             <Select label="Status" name="status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} options={statusOptions} />
           </div>
           <Textarea label="Observações" name="observacoes" value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} />
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2">
             <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancelar</Button>
             <Button type="submit" loading={saving}>{editingAppointment ? 'Salvar' : 'Criar'}</Button>
           </div>

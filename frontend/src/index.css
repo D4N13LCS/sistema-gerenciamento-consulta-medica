@@ -13,6 +13,13 @@
   --color-primary-900: #1e3a8a;
   --color-sidebar: #0f172a;
   --color-sidebar-hover: #1e293b;
+  
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 }
 
 body {

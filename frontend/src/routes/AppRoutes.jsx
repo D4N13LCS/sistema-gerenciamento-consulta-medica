@@ -9,6 +9,7 @@ import DoctorsPage from '../pages/DoctorsPage';
 import SpecialtiesPage from '../pages/SpecialtiesPage';
 import AppointmentsPage from '../pages/AppointmentsPage';
 import PatientsPage from '../pages/PatientsPage';
+import PatientDetailsPage from '../pages/PatientDetailsPage';
 
 const AppRoutes = () => (
   <Routes>
@@ -29,6 +30,7 @@ const AppRoutes = () => (
         <Route path="/specialties" element={<SpecialtiesPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/patients" element={<PatientsPage />} />
+        <Route path="/patients/:id" element={<PatientDetailsPage />} />
       </Route>
     </Route>
 

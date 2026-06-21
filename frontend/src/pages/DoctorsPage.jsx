@@ -115,7 +115,8 @@ const DoctorsPage = () => {
     }
   };
 
-  const handleDelete = async (doctor) => {
+  const handleDelete = async (doctor, e) => {
+    e.stopPropagation();
     if (!window.confirm(`Excluir médico "${doctor.nome}"?`)) return;
     try {
       await doctorService.delete(doctor._id);
@@ -149,9 +150,9 @@ const DoctorsPage = () => {
       key: 'actions',
       label: 'Ações',
       render: (row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => openEdit(row)}>Editar</Button>
-          <Button variant="danger" size="sm" onClick={() => handleDelete(row)}>Excluir</Button>
+          <Button variant="danger" size="sm" onClick={(e) => handleDelete(row, e)}>Excluir</Button>
         </div>
       ),
     },
@@ -200,9 +201,11 @@ const DoctorsPage = () => {
               <p className="text-xs text-red-500 mt-1">Pelo menos uma especialidade é obrigatória</p>
             )}
           </div>
-          <Input label="CRM" name="crm" value={form.crm} onChange={(e) => setForm({ ...form, crm: e.target.value })} required />
-          <Input label="Telefone" name="telefone" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} required />
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <Input label="CRM" name="crm" value={form.crm} onChange={(e) => setForm({ ...form, crm: e.target.value })} required />
+            <Input label="Telefone" name="telefone" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} required />
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2">
             <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancelar</Button>
             <Button type="submit" loading={saving} disabled={form.especialidades.length === 0}>{editingDoctor ? 'Salvar' : 'Criar'}</Button>
           </div>
