@@ -1,6 +1,6 @@
 import LoadingSpinner from './LoadingSpinner';
 
-const Table = ({ columns, data, loading, emptyMessage = 'Nenhum registro encontrado', keyField = 'id' }) => {
+const Table = ({ columns, data, loading, emptyMessage = 'Nenhum registro encontrado', keyField = 'id', onRowClick }) => {
   const getRowKey = (row, index) => {
     if (row[keyField] !== undefined) return row[keyField];
     if (row._id !== undefined) return row._id;
@@ -15,7 +15,7 @@ const Table = ({ columns, data, loading, emptyMessage = 'Nenhum registro encontr
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap"
               >
                 {col.label}
               </th>
@@ -25,21 +25,25 @@ const Table = ({ columns, data, loading, emptyMessage = 'Nenhum registro encontr
         <tbody className="divide-y divide-gray-200">
           {loading ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-12 text-center">
+              <td colSpan={columns.length} className="px-3 py-12 text-center">
                 <LoadingSpinner />
               </td>
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-12 text-center text-gray-500 text-sm">
+              <td colSpan={columns.length} className="px-3 py-12 text-center text-gray-500 text-sm">
                 {emptyMessage}
               </td>
             </tr>
           ) : (
             data.map((row, index) => (
-              <tr key={getRowKey(row, index)} className="hover:bg-gray-50 transition-colors">
+              <tr 
+                key={getRowKey(row, index)} 
+                className={`hover:bg-gray-50 transition-colors cursor-pointer ${onRowClick ? 'hover:bg-blue-50' : ''}`}
+                onClick={() => onRowClick && onRowClick(row)}
+              >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                  <td key={col.key} className="px-3 py-3 text-sm text-gray-700">
                     {col.render ? col.render(row) : row[col.key]}
                   </td>
                 ))}
