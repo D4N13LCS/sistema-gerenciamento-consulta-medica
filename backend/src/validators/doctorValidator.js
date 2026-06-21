@@ -1,4 +1,5 @@
 const { body, param } = require('express-validator');
+const { validateCRM, validatePhone } = require('../utils/validators');
 
 const createDoctorValidator = [
   body('nome')
@@ -6,20 +7,19 @@ const createDoctorValidator = [
     .notEmpty().withMessage('Nome é obrigatório')
     .isLength({ max: 255 }).withMessage('Nome deve ter no máximo 255 caracteres')
     .escape(),
-  body('especialidade')
-    .trim()
-    .notEmpty().withMessage('Especialidade é obrigatória')
-    .isLength({ max: 255 }).withMessage('Especialidade deve ter no máximo 255 caracteres')
-    .escape(),
+  body('especialidades')
+    .isArray({ min: 1 }).withMessage('Pelo menos uma especialidade é obrigatória'),
+  body('especialidades.*')
+    .isMongoId().withMessage('Especialidade deve ser um ObjectId válido'),
   body('crm')
     .trim()
     .notEmpty().withMessage('CRM é obrigatório')
-    .isLength({ max: 50 }).withMessage('CRM deve ter no máximo 50 caracteres')
+    .custom((value) => validateCRM(value)).withMessage('CRM inválido')
     .escape(),
   body('telefone')
     .trim()
     .notEmpty().withMessage('Telefone é obrigatório')
-    .isLength({ max: 20 }).withMessage('Telefone deve ter no máximo 20 caracteres')
+    .custom((value) => validatePhone(value)).withMessage('Telefone inválido')
     .escape(),
 ];
 
@@ -31,23 +31,23 @@ const updateDoctorValidator = [
     .notEmpty().withMessage('Nome não pode ser vazio')
     .isLength({ max: 255 }).withMessage('Nome deve ter no máximo 255 caracteres')
     .escape(),
-  body('especialidade')
+  body('especialidades')
     .optional()
-    .trim()
-    .notEmpty().withMessage('Especialidade não pode ser vazia')
-    .isLength({ max: 255 }).withMessage('Especialidade deve ter no máximo 255 caracteres')
-    .escape(),
+    .isArray().withMessage('Especialidades deve ser um array'),
+  body('especialidades.*')
+    .optional()
+    .isMongoId().withMessage('Especialidade deve ser um ObjectId válido'),
   body('crm')
     .optional()
     .trim()
     .notEmpty().withMessage('CRM não pode ser vazio')
-    .isLength({ max: 50 }).withMessage('CRM deve ter no máximo 50 caracteres')
+    .custom((value) => validateCRM(value)).withMessage('CRM inválido')
     .escape(),
   body('telefone')
     .optional()
     .trim()
     .notEmpty().withMessage('Telefone não pode ser vazio')
-    .isLength({ max: 20 }).withMessage('Telefone deve ter no máximo 20 caracteres')
+    .custom((value) => validatePhone(value)).withMessage('Telefone inválido')
     .escape(),
 ];
 

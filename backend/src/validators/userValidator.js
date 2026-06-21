@@ -14,6 +14,9 @@ const createUserValidator = [
   body('senha')
     .notEmpty().withMessage('Senha é obrigatória')
     .isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
+  body('role')
+    .optional()
+    .isIn(['user', 'admin']).withMessage('Role deve ser user ou admin'),
 ];
 
 const updateUserValidator = [

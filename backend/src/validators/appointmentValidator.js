@@ -2,20 +2,14 @@ const { body, param } = require('express-validator');
 
 const createAppointmentValidator = [
   body('paciente')
-    .trim()
     .notEmpty().withMessage('Paciente é obrigatório')
-    .isLength({ max: 255 }).withMessage('Paciente deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Paciente deve ser um ObjectId válido'),
   body('medico')
-    .trim()
     .notEmpty().withMessage('Médico é obrigatório')
-    .isLength({ max: 255 }).withMessage('Médico deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Médico deve ser um ObjectId válido'),
   body('especialidade')
-    .trim()
     .notEmpty().withMessage('Especialidade é obrigatória')
-    .isLength({ max: 255 }).withMessage('Especialidade deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Especialidade deve ser um ObjectId válido'),
   body('data')
     .trim()
     .notEmpty().withMessage('Data é obrigatória')
@@ -39,22 +33,16 @@ const updateAppointmentValidator = [
   param('id').isMongoId().withMessage('ID inválido'),
   body('paciente')
     .optional()
-    .trim()
     .notEmpty().withMessage('Paciente não pode ser vazio')
-    .isLength({ max: 255 }).withMessage('Paciente deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Paciente deve ser um ObjectId válido'),
   body('medico')
     .optional()
-    .trim()
     .notEmpty().withMessage('Médico não pode ser vazio')
-    .isLength({ max: 255 }).withMessage('Médico deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Médico deve ser um ObjectId válido'),
   body('especialidade')
     .optional()
-    .trim()
     .notEmpty().withMessage('Especialidade não pode ser vazia')
-    .isLength({ max: 255 }).withMessage('Especialidade deve ter no máximo 255 caracteres')
-    .escape(),
+    .isMongoId().withMessage('Especialidade deve ser um ObjectId válido'),
   body('data')
     .optional()
     .trim()
