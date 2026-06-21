@@ -6,6 +6,7 @@ const {
   createPatientValidator,
   updatePatientValidator,
   mongoIdValidator,
+  examIdValidator,
 } = require('../validators/patientValidator');
 
 const router = express.Router();
@@ -95,5 +96,99 @@ router.put('/:id', updatePatientValidator, validate, PatientController.update);
  *         description: Paciente excluído
  */
 router.delete('/:id', mongoIdValidator, validate, PatientController.delete);
+
+/**
+ * @swagger
+ * /patients/{id}/exams:
+ *   post:
+ *     summary: Adicionar exame ao paciente
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *               resultado:
+ *                 type: string
+ *               observacoes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Exame adicionado
+ */
+router.post('/:id/exams', mongoIdValidator, validate, PatientController.addExam);
+
+/**
+ * @swagger
+ * /patients/{id}/exams/{examId}:
+ *   put:
+ *     summary: Atualizar exame do paciente
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *               resultado:
+ *                 type: string
+ *               observacoes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Exame atualizado
+ */
+router.put('/:id/exams/:examId', examIdValidator, validate, PatientController.updateExam);
+
+/**
+ * @swagger
+ * /patients/{id}/exams/{examId}:
+ *   delete:
+ *     summary: Remover exame do paciente
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: examId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Exame removido
+ */
+router.delete('/:id/exams/:examId', examIdValidator, validate, PatientController.removeExam);
 
 module.exports = router;

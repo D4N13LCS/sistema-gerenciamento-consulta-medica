@@ -64,6 +64,81 @@ const PatientService = {
   async count() {
     return Patient.countDocuments();
   },
+
+  // Exam management methods
+  async addExam(patientId, examData) {
+    try {
+      const patient = await Patient.findByIdAndUpdate(
+        patientId,
+        { $push: { exames: examData } },
+        { new: true, runValidators: true }
+      ).lean();
+
+      if (!patient) {
+        const error = new Error('Paciente não encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+      return patient;
+    } catch (error) {
+      if (error.statusCode) throw error;
+      handleMongoError(error);
+    }
+  },
+
+  async updateExam(patientId, examId, examData) {
+    try {
+      // First, find the patient to check if the exam exists
+      const patient = await Patient.findById(patientId);
+      if (!patient) {
+        const error = new Error('Paciente não encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Check if the exam exists in the patient's exams array
+      const examIndex = patient.exames.findIndex(exam => exam._id.toString() === examId.toString());
+      if (examIndex === -1) {
+        const error = new Error('Paciente ou exame não encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Update the exam directly
+      patient.exames[examIndex] = { ...patient.exames[examIndex].toObject(), ...examData };
+      await patient.save();
+
+      return patient.toObject();
+    } catch (error) {
+      if (error.statusCode) throw error;
+      if (error.name === 'CastError' || error.name === 'ValidationError') {
+        const err = new Error('Paciente ou exame não encontrado');
+        err.statusCode = 404;
+        throw err;
+      }
+      handleMongoError(error);
+    }
+  },
+
+  async removeExam(patientId, examId) {
+    try {
+      const patient = await Patient.findByIdAndUpdate(
+        patientId,
+        { $pull: { exames: { _id: examId } } },
+        { new: true }
+      ).lean();
+
+      if (!patient) {
+        const error = new Error('Paciente não encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+      return patient;
+    } catch (error) {
+      if (error.statusCode) throw error;
+      handleMongoError(error);
+    }
+  },
 };
 
 module.exports = PatientService;

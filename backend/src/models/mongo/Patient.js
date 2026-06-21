@@ -1,7 +1,34 @@
 const mongoose = require('mongoose');
 
+const examSchema = new mongoose.Schema({
+  nome: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 255,
+  },
+  data: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  resultado: {
+    type: String,
+    trim: true,
+    maxlength: 2000,
+    default: '',
+  },
+  observacoes: {
+    type: String,
+    trim: true,
+    maxlength: 2000,
+    default: '',
+  },
+}, { _id: true, timestamps: true });
+
 const patientSchema = new mongoose.Schema(
   {
+    // Dados pessoais
     nome: {
       type: String,
       required: true,
@@ -38,13 +65,94 @@ const patientSchema = new mongoose.Schema(
       maxlength: 500,
       default: '',
     },
-    historicoExames: {
+
+    // Histórico médico
+    historicoMedico: {
+      doencasPreexistentes: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      alergias: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      medicamentosEmUso: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      cirurgiasAnteriores: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      historicoFamiliar: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      comorbidades: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+    },
+
+    // Anamnese
+    anamnese: {
+      queixaPrincipal: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      historiaDoencaAtual: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      habitosVida: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      fatoresRisco: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+      observacoesClinicas: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        default: '',
+      },
+    },
+
+    // Observações gerais
+    observacoesGerais: {
       type: String,
       trim: true,
       maxlength: 5000,
       default: '',
     },
-    anamnese: {
+
+    // Histórico de exames (estruturado)
+    exames: [examSchema],
+
+    // Campos legados para compatibilidade
+    historicoExames: {
       type: String,
       trim: true,
       maxlength: 5000,

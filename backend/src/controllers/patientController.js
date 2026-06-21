@@ -45,6 +45,39 @@ const PatientController = {
       next(error);
     }
   },
+
+  async addExam(req, res, next) {
+    try {
+      const patient = await PatientService.addExam(req.params.id, req.body);
+      // Transform exames to exams for API compatibility
+      const responseData = { ...patient, exams: patient.exames };
+      res.json({ success: true, data: responseData });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateExam(req, res, next) {
+    try {
+      const patient = await PatientService.updateExam(req.params.id, req.params.examId, req.body);
+      // Transform exames to exams for API compatibility
+      const responseData = { ...patient, exams: patient.exames };
+      res.json({ success: true, data: responseData });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async removeExam(req, res, next) {
+    try {
+      const patient = await PatientService.removeExam(req.params.id, req.params.examId);
+      // Transform exames to exams for API compatibility
+      const responseData = { ...patient, exams: patient.exames };
+      res.json({ success: true, data: responseData });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = PatientController;

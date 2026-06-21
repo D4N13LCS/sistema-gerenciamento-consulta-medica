@@ -17,6 +17,16 @@ router.use('/appointments', appointmentRoutes);
 router.use('/patients', patientRoutes);
 router.use('/dashboard', dashboardRoutes);
 
+router.get('/', (_req, res) => {
+  res.json({
+    name: 'Medical Appointments API',
+    version: '1.0.0',
+    status: 'online',
+    documentation: '/api/docs',
+    health: '/api/health'
+  });
+});
+
 router.get('/health', (_req, res) => {
   res.json({ success: true, message: 'API funcionando' });
 });

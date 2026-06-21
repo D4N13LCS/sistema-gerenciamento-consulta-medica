@@ -2,6 +2,7 @@ const { body, param } = require('express-validator');
 const { validateCPF, validateDateOfBirth, validateEmail, validatePhone } = require('../utils/validators');
 
 const createPatientValidator = [
+  // Dados pessoais
   body('nome')
     .trim()
     .notEmpty().withMessage('Nome é obrigatório')
@@ -33,15 +34,105 @@ const createPatientValidator = [
     .trim()
     .isLength({ max: 500 }).withMessage('Endereço deve ter no máximo 500 caracteres')
     .escape(),
+
+  // Histórico médico
+  body('historicoMedico.doencasPreexistentes')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Doenças pré-existentes deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.alergias')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Alergias deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.medicamentosEmUso')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Medicamentos em uso deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.cirurgiasAnteriores')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Cirurgias anteriores deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.historicoFamiliar')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Histórico familiar deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.comorbidades')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Comorbidades deve ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Anamnese
+  body('anamnese.queixaPrincipal')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Queixa principal deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.historiaDoencaAtual')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('História da doença atual deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.habitosVida')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Hábitos de vida deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.fatoresRisco')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Fatores de risco deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.observacoesClinicas')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Observações clínicas deve ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Observações gerais
+  body('observacoesGerais')
+    .optional()
+    .trim()
+    .isLength({ max: 5000 }).withMessage('Observações gerais devem ter no máximo 5000 caracteres')
+    .escape(),
+
+  // Exames
+  body('exames')
+    .optional()
+    .isArray().withMessage('Exames deve ser um array'),
+  body('exames.*.nome')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Nome do exame é obrigatório')
+    .isLength({ max: 255 }).withMessage('Nome do exame deve ter no máximo 255 caracteres')
+    .escape(),
+  body('exames.*.data')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Data do exame é obrigatória')
+    .isISO8601().withMessage('Data do exame inválida')
+    .escape(),
+  body('exames.*.resultado')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Resultado do exame deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('exames.*.observacoes')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Observações do exame devem ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Campos legados para compatibilidade
   body('historicoExames')
     .optional()
     .trim()
     .isLength({ max: 5000 }).withMessage('Histórico de exames deve ter no máximo 5000 caracteres')
-    .escape(),
-  body('anamnese')
-    .optional()
-    .trim()
-    .isLength({ max: 5000 }).withMessage('Anamnese deve ter no máximo 5000 caracteres')
     .escape(),
   body('observacoesMedicas')
     .optional()
@@ -52,6 +143,8 @@ const createPatientValidator = [
 
 const updatePatientValidator = [
   param('id').isMongoId().withMessage('ID inválido'),
+  
+  // Dados pessoais
   body('nome')
     .optional()
     .trim()
@@ -86,15 +179,105 @@ const updatePatientValidator = [
     .trim()
     .isLength({ max: 500 }).withMessage('Endereço deve ter no máximo 500 caracteres')
     .escape(),
+
+  // Histórico médico
+  body('historicoMedico.doencasPreexistentes')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Doenças pré-existentes deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.alergias')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Alergias deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.medicamentosEmUso')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Medicamentos em uso deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.cirurgiasAnteriores')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Cirurgias anteriores deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.historicoFamiliar')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Histórico familiar deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('historicoMedico.comorbidades')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Comorbidades deve ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Anamnese
+  body('anamnese.queixaPrincipal')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Queixa principal deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.historiaDoencaAtual')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('História da doença atual deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.habitosVida')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Hábitos de vida deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.fatoresRisco')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Fatores de risco deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('anamnese.observacoesClinicas')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Observações clínicas deve ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Observações gerais
+  body('observacoesGerais')
+    .optional()
+    .trim()
+    .isLength({ max: 5000 }).withMessage('Observações gerais devem ter no máximo 5000 caracteres')
+    .escape(),
+
+  // Exames
+  body('exames')
+    .optional()
+    .isArray().withMessage('Exames deve ser um array'),
+  body('exames.*.nome')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Nome do exame é obrigatório')
+    .isLength({ max: 255 }).withMessage('Nome do exame deve ter no máximo 255 caracteres')
+    .escape(),
+  body('exames.*.data')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Data do exame é obrigatória')
+    .isISO8601().withMessage('Data do exame inválida')
+    .escape(),
+  body('exames.*.resultado')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Resultado do exame deve ter no máximo 2000 caracteres')
+    .escape(),
+  body('exames.*.observacoes')
+    .optional()
+    .trim()
+    .isLength({ max: 2000 }).withMessage('Observações do exame devem ter no máximo 2000 caracteres')
+    .escape(),
+
+  // Campos legados para compatibilidade
   body('historicoExames')
     .optional()
     .trim()
     .isLength({ max: 5000 }).withMessage('Histórico de exames deve ter no máximo 5000 caracteres')
-    .escape(),
-  body('anamnese')
-    .optional()
-    .trim()
-    .isLength({ max: 5000 }).withMessage('Anamnese deve ter no máximo 5000 caracteres')
     .escape(),
   body('observacoesMedicas')
     .optional()
@@ -107,8 +290,14 @@ const mongoIdValidator = [
   param('id').isMongoId().withMessage('ID inválido'),
 ];
 
+const examIdValidator = [
+  param('id').isMongoId().withMessage('ID do paciente inválido'),
+  param('examId').isMongoId().withMessage('ID do exame inválido'),
+];
+
 module.exports = {
   createPatientValidator,
   updatePatientValidator,
   mongoIdValidator,
+  examIdValidator,
 };
