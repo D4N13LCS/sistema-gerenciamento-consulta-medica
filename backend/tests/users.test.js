@@ -121,5 +121,29 @@ describe('Users API', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
     });
+
+    it('should prevent deletion of admin user', async () => {
+      // Create an admin user through the API
+      const res = await request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          nome: 'Admin Test 2',
+          email: 'admin2@test.com',
+          senha: 'admin123',
+          role: 'admin',
+        });
+
+      console.log('Created admin user:', res.body.data);
+      const adminUserId = res.body.data.id;
+
+      const deleteRes = await request(app)
+        .delete(`/api/users/${adminUserId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      console.log('Delete response:', deleteRes.status, deleteRes.body);
+      expect(deleteRes.status).toBe(403);
+      expect(deleteRes.body.message).toBe('O usuário administrador não pode ser excluído');
+    });
   });
 });

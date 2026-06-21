@@ -3,19 +3,40 @@ const { createPgPool } = require('../../config/database');
 const UserModel = {
   async findAll() {
     const pool = createPgPool();
-    const result = await pool.query(
-      'SELECT id, nome, email, created_at, updated_at FROM users ORDER BY id ASC'
-    );
-    return result.rows;
+    try {
+      const result = await pool.query(
+        'SELECT id, nome, email, role, created_at, updated_at FROM users ORDER BY id ASC'
+      );
+      return result.rows;
+    } catch (error) {
+      if (error.code === '42703') { // column does not exist
+        const result = await pool.query(
+          'SELECT id, nome, email, created_at, updated_at FROM users ORDER BY id ASC'
+        );
+        return result.rows;
+      }
+      throw error;
+    }
   },
 
   async findById(id) {
     const pool = createPgPool();
-    const result = await pool.query(
-      'SELECT id, nome, email, created_at, updated_at FROM users WHERE id = $1',
-      [id]
-    );
-    return result.rows[0] || null;
+    try {
+      const result = await pool.query(
+        'SELECT id, nome, email, role, created_at, updated_at FROM users WHERE id = $1',
+        [id]
+      );
+      return result.rows[0] || null;
+    } catch (error) {
+      if (error.code === '42703') { // column does not exist
+        const result = await pool.query(
+          'SELECT id, nome, email, created_at, updated_at FROM users WHERE id = $1',
+          [id]
+        );
+        return result.rows[0] || null;
+      }
+      throw error;
+    }
   },
 
   async findByEmail(email) {
@@ -24,14 +45,26 @@ const UserModel = {
     return result.rows[0] || null;
   },
 
-  async create({ nome, email, senha }) {
+  async create({ nome, email, senha, role = 'user' }) {
     const pool = createPgPool();
-    const result = await pool.query(
-      `INSERT INTO users (nome, email, senha) VALUES ($1, $2, $3)
-       RETURNING id, nome, email, created_at, updated_at`,
-      [nome, email, senha]
-    );
-    return result.rows[0];
+    try {
+      const result = await pool.query(
+        `INSERT INTO users (nome, email, senha, role) VALUES ($1, $2, $3, $4)
+         RETURNING id, nome, email, role, created_at, updated_at`,
+        [nome, email, senha, role]
+      );
+      return result.rows[0];
+    } catch (error) {
+      if (error.code === '42703') { // column does not exist
+        const result = await pool.query(
+          `INSERT INTO users (nome, email, senha) VALUES ($1, $2, $3)
+           RETURNING id, nome, email, created_at, updated_at`,
+          [nome, email, senha]
+        );
+        return result.rows[0];
+      }
+      throw error;
+    }
   },
 
   async update(id, { nome, email, senha }) {

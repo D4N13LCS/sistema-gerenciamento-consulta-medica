@@ -8,12 +8,11 @@ const doctorSchema = new mongoose.Schema(
       trim: true,
       maxlength: 255,
     },
-    especialidade: {
-      type: String,
+    especialidades: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Specialty',
       required: true,
-      trim: true,
-      maxlength: 255,
-    },
+    }],
     crm: {
       type: String,
       required: true,

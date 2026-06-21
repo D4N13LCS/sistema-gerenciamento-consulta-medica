@@ -16,7 +16,7 @@ const UserService = {
     return user;
   },
 
-  async create({ nome, email, senha }) {
+  async create({ nome, email, senha, role = 'user' }) {
     const existing = await UserModel.findByEmail(email);
     if (existing) {
       const error = new Error('E-mail já cadastrado');
@@ -25,7 +25,7 @@ const UserService = {
     }
 
     const hashedPassword = await AuthService.hashPassword(senha);
-    return UserModel.create({ nome, email, senha: hashedPassword });
+    return UserModel.create({ nome, email, senha: hashedPassword, role });
   },
 
   async update(id, data) {
@@ -55,13 +55,27 @@ const UserService = {
   },
 
   async delete(id) {
-    const user = await UserModel.delete(id);
+    const user = await UserModel.findById(id);
     if (!user) {
       const error = new Error('Usuário não encontrado');
       error.statusCode = 404;
       throw error;
     }
-    return user;
+    
+    // Prevent deletion of admin users
+    if (user.role === 'admin') {
+      const error = new Error('O usuário administrador não pode ser excluído');
+      error.statusCode = 403;
+      throw error;
+    }
+    
+    const deleted = await UserModel.delete(id);
+    if (!deleted) {
+      const error = new Error('Usuário não encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+    return deleted;
   },
 
   async count() {

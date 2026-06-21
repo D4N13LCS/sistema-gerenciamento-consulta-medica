@@ -25,6 +25,7 @@ const setupPostgresMem = () => {
       nome VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
       senha VARCHAR(255) NOT NULL,
+      role VARCHAR(20) NOT NULL DEFAULT 'user',
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
@@ -55,9 +56,11 @@ const initializeTestDb = async () => {
 const cleanDatabase = async () => {
   const pool = require('../src/config/database').createPgPool();
   await pool.query('DELETE FROM users');
+  const Patient = require('../src/models/mongo/Patient');
   await Doctor.deleteMany({});
   await Specialty.deleteMany({});
   await Appointment.deleteMany({});
+  await Patient.deleteMany({});
 };
 
 const seedAdminUser = async () => {
@@ -66,6 +69,7 @@ const seedAdminUser = async () => {
     nome: 'Admin Test',
     email: 'admin@test.com',
     senha: hashedPassword,
+    role: 'admin',
   });
 };
 

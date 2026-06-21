@@ -3,22 +3,19 @@ const mongoose = require('mongoose');
 const appointmentSchema = new mongoose.Schema(
   {
     paciente: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Patient',
       required: true,
-      trim: true,
-      maxlength: 255,
     },
     medico: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Doctor',
       required: true,
-      trim: true,
-      maxlength: 255,
     },
     especialidade: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Specialty',
       required: true,
-      trim: true,
-      maxlength: 255,
     },
     data: {
       type: String,
