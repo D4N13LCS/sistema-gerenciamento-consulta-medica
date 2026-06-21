@@ -38,9 +38,28 @@ const options = {
           properties: {
             _id: { type: 'string' },
             nome: { type: 'string' },
-            especialidade: { type: 'string' },
+            especialidades: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Array de especialidade ObjectIds',
+            },
             crm: { type: 'string' },
             telefone: { type: 'string' },
+          },
+        },
+        Patient: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            nome: { type: 'string' },
+            dataNascimento: { type: 'string', format: 'date' },
+            cpf: { type: 'string' },
+            telefone: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            endereco: { type: 'string' },
+            historicoExames: { type: 'string' },
+            anamnese: { type: 'string' },
+            observacoesMedicas: { type: 'string' },
           },
         },
         Specialty: {
@@ -55,9 +74,9 @@ const options = {
           type: 'object',
           properties: {
             _id: { type: 'string' },
-            paciente: { type: 'string' },
-            medico: { type: 'string' },
-            especialidade: { type: 'string' },
+            paciente: { type: 'string', description: 'Patient ObjectId' },
+            medico: { type: 'string', description: 'Doctor ObjectId' },
+            especialidade: { type: 'string', description: 'Specialty ObjectId' },
             data: { type: 'string', format: 'date' },
             horario: { type: 'string' },
             observacoes: { type: 'string' },

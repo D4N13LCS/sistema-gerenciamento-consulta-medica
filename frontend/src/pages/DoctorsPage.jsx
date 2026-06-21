@@ -1,16 +1,18 @@
 import { useEffect, useState, useCallback } from 'react';
-import { doctorService, getErrorMessage } from '../services';
+import { doctorService, specialtyService, getErrorMessage } from '../services';
 import { useToast } from '../contexts/ToastContext';
+import { validateCRM, validatePhone } from '../utils/validators';
 import PageHeader from '../components/PageHeader';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
-const emptyForm = { nome: '', especialidade: '', crm: '', telefone: '' };
+const emptyForm = { nome: '', especialidades: [], crm: '', telefone: '' };
 
 const DoctorsPage = () => {
   const [doctors, setDoctors] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
@@ -30,9 +32,19 @@ const DoctorsPage = () => {
     }
   }, [showError]);
 
+  const fetchSpecialties = useCallback(async () => {
+    try {
+      const response = await specialtyService.getAll();
+      setSpecialties(response.data.data);
+    } catch (err) {
+      showError(getErrorMessage(err));
+    }
+  }, [showError]);
+
   useEffect(() => {
     fetchDoctors();
-  }, [fetchDoctors]);
+    fetchSpecialties();
+  }, [fetchDoctors, fetchSpecialties]);
 
   const openCreate = () => {
     setEditingDoctor(null);
@@ -44,7 +56,7 @@ const DoctorsPage = () => {
     setEditingDoctor(doctor);
     setForm({
       nome: doctor.nome,
-      especialidade: doctor.especialidade,
+      especialidades: (doctor.especialidades || []).map(spec => spec._id || spec),
       crm: doctor.crm,
       telefone: doctor.telefone,
     });
@@ -53,6 +65,38 @@ const DoctorsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Frontend validations
+    if (!form.nome || form.nome.trim() === '') {
+      showError('Nome é obrigatório');
+      return;
+    }
+    
+    if (!form.especialidades || form.especialidades.length === 0) {
+      showError('Pelo menos uma especialidade é obrigatória');
+      return;
+    }
+    
+    if (!form.crm || form.crm.trim() === '') {
+      showError('CRM é obrigatório');
+      return;
+    }
+    
+    if (!validateCRM(form.crm)) {
+      showError('CRM inválido');
+      return;
+    }
+    
+    if (!form.telefone || form.telefone.trim() === '') {
+      showError('Telefone é obrigatório');
+      return;
+    }
+    
+    if (!validatePhone(form.telefone)) {
+      showError('Telefone inválido');
+      return;
+    }
+    
     setSaving(true);
     try {
       if (editingDoctor) {
@@ -84,7 +128,21 @@ const DoctorsPage = () => {
 
   const columns = [
     { key: 'nome', label: 'Nome' },
-    { key: 'especialidade', label: 'Especialidade' },
+    {
+      key: 'especialidades',
+      label: 'Especialidades',
+      render: (row) => (
+        <div>
+          {row.especialidades && row.especialidades.length > 0
+            ? row.especialidades.map((spec) => (
+                <span key={spec._id || spec} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+                  {spec.nome || spec}
+                </span>
+              ))
+            : '-'}
+        </div>
+      ),
+    },
     { key: 'crm', label: 'CRM' },
     { key: 'telefone', label: 'Telefone' },
     {
@@ -117,12 +175,36 @@ const DoctorsPage = () => {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label="Nome" name="nome" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} required />
-          <Input label="Especialidade" name="especialidade" value={form.especialidade} onChange={(e) => setForm({ ...form, especialidade: e.target.value })} required />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Especialidades</label>
+            <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+              {specialties.map((specialty) => (
+                <label key={specialty._id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={form.especialidades.includes(specialty._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setForm({ ...form, especialidades: [...form.especialidades, specialty._id] });
+                      } else {
+                        setForm({ ...form, especialidades: form.especialidades.filter(id => id !== specialty._id) });
+                      }
+                    }}
+                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="text-sm">{specialty.nome}</span>
+                </label>
+              ))}
+            </div>
+            {form.especialidades.length === 0 && (
+              <p className="text-xs text-red-500 mt-1">Pelo menos uma especialidade é obrigatória</p>
+            )}
+          </div>
           <Input label="CRM" name="crm" value={form.crm} onChange={(e) => setForm({ ...form, crm: e.target.value })} required />
           <Input label="Telefone" name="telefone" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} required />
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button type="submit" loading={saving}>{editingDoctor ? 'Salvar' : 'Criar'}</Button>
+            <Button type="submit" loading={saving} disabled={form.especialidades.length === 0}>{editingDoctor ? 'Salvar' : 'Criar'}</Button>
           </div>
         </form>
       </Modal>

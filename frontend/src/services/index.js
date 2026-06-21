@@ -37,6 +37,14 @@ export const appointmentService = {
   delete: (id) => api.delete(`/appointments/${id}`),
 };
 
+export const patientService = {
+  getAll: () => api.get('/patients'),
+  getById: (id) => api.get(`/patients/${id}`),
+  create: (data) => api.post('/patients', data),
+  update: (id, data) => api.put(`/patients/${id}`, data),
+  delete: (id) => api.delete(`/patients/${id}`),
+};
+
 export const dashboardService = {
   getStats: () => api.get('/dashboard/stats'),
 };

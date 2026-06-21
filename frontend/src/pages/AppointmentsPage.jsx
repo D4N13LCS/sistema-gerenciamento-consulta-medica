@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { appointmentService, getErrorMessage } from '../services';
+import { appointmentService, patientService, doctorService, specialtyService, getErrorMessage } from '../services';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, STATUS_LABELS, STATUS_COLORS } from '../utils/auth';
 import PageHeader from '../components/PageHeader';
@@ -24,6 +24,9 @@ const statusOptions = Object.entries(STATUS_LABELS).map(([value, label]) => ({ v
 
 const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
@@ -43,9 +46,39 @@ const AppointmentsPage = () => {
     }
   }, [showError]);
 
+  const fetchPatients = useCallback(async () => {
+    try {
+      const response = await patientService.getAll();
+      setPatients(response.data.data);
+    } catch (err) {
+      showError(getErrorMessage(err));
+    }
+  }, [showError]);
+
+  const fetchDoctors = useCallback(async () => {
+    try {
+      const response = await doctorService.getAll();
+      setDoctors(response.data.data);
+    } catch (err) {
+      showError(getErrorMessage(err));
+    }
+  }, [showError]);
+
+  const fetchSpecialties = useCallback(async () => {
+    try {
+      const response = await specialtyService.getAll();
+      setSpecialties(response.data.data);
+    } catch (err) {
+      showError(getErrorMessage(err));
+    }
+  }, [showError]);
+
   useEffect(() => {
     fetchAppointments();
-  }, [fetchAppointments]);
+    fetchPatients();
+    fetchDoctors();
+    fetchSpecialties();
+  }, [fetchAppointments, fetchPatients, fetchDoctors, fetchSpecialties]);
 
   const openCreate = () => {
     setEditingAppointment(null);
@@ -56,9 +89,9 @@ const AppointmentsPage = () => {
   const openEdit = (appointment) => {
     setEditingAppointment(appointment);
     setForm({
-      paciente: appointment.paciente,
-      medico: appointment.medico,
-      especialidade: appointment.especialidade,
+      paciente: appointment.paciente?._id || appointment.paciente,
+      medico: appointment.medico?._id || appointment.medico,
+      especialidade: appointment.especialidade?._id || appointment.especialidade,
       data: appointment.data?.split('T')[0] || appointment.data,
       horario: appointment.horario,
       observacoes: appointment.observacoes || '',
@@ -88,7 +121,8 @@ const AppointmentsPage = () => {
   };
 
   const handleDelete = async (appointment) => {
-    if (!window.confirm(`Excluir consulta de "${appointment.paciente}"?`)) return;
+    const patientName = appointment.paciente?.nome || appointment.paciente;
+    if (!window.confirm(`Excluir consulta de "${patientName}"?`)) return;
     try {
       await appointmentService.delete(appointment._id);
       showSuccess('Consulta excluída com sucesso!');
@@ -98,10 +132,34 @@ const AppointmentsPage = () => {
     }
   };
 
+  // Get available specialties based on selected doctor
+  const getAvailableSpecialties = () => {
+    if (!form.medico) return specialties;
+    const selectedDoctor = doctors.find(d => d._id === form.medico);
+    if (!selectedDoctor || !selectedDoctor.especialidades) return specialties;
+    return specialties.filter(s => selectedDoctor.especialidades.some(es => es._id === s._id || es === s._id));
+  };
+
+  const handleMedicoChange = (value) => {
+    setForm({ ...form, medico: value, especialidade: '' });
+  };
+
   const columns = [
-    { key: 'paciente', label: 'Paciente' },
-    { key: 'medico', label: 'Médico' },
-    { key: 'especialidade', label: 'Especialidade' },
+    {
+      key: 'paciente',
+      label: 'Paciente',
+      render: (row) => row.paciente?.nome || row.paciente || '-',
+    },
+    {
+      key: 'medico',
+      label: 'Médico',
+      render: (row) => row.medico?.nome || row.medico || '-',
+    },
+    {
+      key: 'especialidade',
+      label: 'Especialidade',
+      render: (row) => row.especialidade?.nome || row.especialidade || '-',
+    },
     {
       key: 'data',
       label: 'Data',
@@ -148,9 +206,31 @@ const AppointmentsPage = () => {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Paciente" name="paciente" value={form.paciente} onChange={(e) => setForm({ ...form, paciente: e.target.value })} required />
-            <Input label="Médico" name="medico" value={form.medico} onChange={(e) => setForm({ ...form, medico: e.target.value })} required />
-            <Input label="Especialidade" name="especialidade" value={form.especialidade} onChange={(e) => setForm({ ...form, especialidade: e.target.value })} required />
+            <Select
+              label="Paciente"
+              name="paciente"
+              value={form.paciente}
+              onChange={(e) => setForm({ ...form, paciente: e.target.value })}
+              options={patients.map(p => ({ value: p._id, label: p.nome }))}
+              required
+            />
+            <Select
+              label="Médico"
+              name="medico"
+              value={form.medico}
+              onChange={(e) => handleMedicoChange(e.target.value)}
+              options={doctors.map(d => ({ value: d._id, label: d.nome }))}
+              required
+            />
+            <Select
+              label="Especialidade"
+              name="especialidade"
+              value={form.especialidade}
+              onChange={(e) => setForm({ ...form, especialidade: e.target.value })}
+              options={getAvailableSpecialties().map(s => ({ value: s._id, label: s.nome }))}
+              required
+              disabled={!form.medico}
+            />
             <Input label="Data" type="date" name="data" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} required />
             <Input label="Horário" type="time" name="horario" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} required />
             <Select label="Status" name="status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} options={statusOptions} />

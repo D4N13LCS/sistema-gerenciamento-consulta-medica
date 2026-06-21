@@ -70,6 +70,11 @@ const UsersPage = () => {
   };
 
   const handleDelete = async (user) => {
+    // Prevent deletion of admin user (id = 1)
+    if (user.id === 1) {
+      showError('O usuário administrador não pode ser excluído');
+      return;
+    }
     if (!window.confirm(`Excluir usuário "${user.nome}"?`)) return;
     try {
       await userService.delete(user.id);
@@ -94,7 +99,7 @@ const UsersPage = () => {
       render: (row) => (
         <div className="flex gap-2">
           <Button variant="ghost" size="sm" onClick={() => openEdit(row)}>Editar</Button>
-          <Button variant="danger" size="sm" onClick={() => handleDelete(row)}>Excluir</Button>
+          <Button variant="danger" size="sm" onClick={() => handleDelete(row)} disabled={row.id === 1}>Excluir</Button>
         </div>
       ),
     },

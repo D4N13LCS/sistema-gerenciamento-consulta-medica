@@ -5,6 +5,7 @@ import Button from './Button';
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
   { to: '/appointments', label: 'Consultas', icon: '📅' },
+  { to: '/patients', label: 'Pacientes', icon: '👤' },
   { to: '/doctors', label: 'Médicos', icon: '👨‍⚕️' },
   { to: '/specialties', label: 'Especialidades', icon: '🏥' },
   { to: '/users', label: 'Usuários', icon: '👥' },

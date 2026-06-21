@@ -5,6 +5,7 @@ const doctorRoutes = require('./doctorRoutes');
 const specialtyRoutes = require('./specialtyRoutes');
 const appointmentRoutes = require('./appointmentRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
+const patientRoutes = require('./patientRoutes');
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use('/users', userRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/specialties', specialtyRoutes);
 router.use('/appointments', appointmentRoutes);
+router.use('/patients', patientRoutes);
 router.use('/dashboard', dashboardRoutes);
 
 router.get('/health', (_req, res) => {
